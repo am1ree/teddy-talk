@@ -1,0 +1,83 @@
+<template>
+  <div class="container p-6 space-y-4">
+    <h2 class="text-2xl text-white text-semibold">Make Teddy say something</h2>
+
+    <div class="input-container">
+      <input ref="inputField" placeholder="Enter Message" class="input-field">
+      <button class="submit-button" @click="handleSubmit">Submit</button>
+    </div>
+  </div>
+</template>
+
+<script>
+import AWS from 'aws-sdk';
+
+export default {
+  methods: {
+    async handleSubmit() {
+      try {
+        // Read content from the input field
+        const message = this.$refs.inputField.value;
+
+        // Create JSON content
+        const jsonContent = JSON.stringify({ data: message }, null, 2);
+
+        // Upload the JSON document to S3
+        //await this.uploadToS3(jsonContent);
+
+        // Optional: Show success message or perform other actions
+        console.log('JSON document uploaded successfully');
+      } catch (error) {
+        console.error('Error uploading JSON document:', error);
+        // Handle error, show error message, etc.
+      }
+    },
+
+    async uploadToS3(content) {
+      // Set your S3 bucket name and the destination file name
+      const bucketName = 'your-s3-bucket-name';
+      const fileName = 'modified_document.json';
+
+      // Configure AWS SDK with your credentials and region
+      AWS.config.update({
+        accessKeyId: 'AKIAZI2LFAGTA3RNDVJX',
+        secretAccessKey: '0C2z5xj0WXwYoPv+TXcjhWoo+0DH7b4gt5GpA+/1'
+      });
+
+      // Create an S3 object
+      const s3 = new AWS.S3();
+
+      // Upload the JSON content to S3
+      await s3
+        .upload({
+          Bucket: 'teddyconversationhistory',
+          Key: 'message.json',
+          Body: content,
+          ContentType: 'application/json', // Set content type to JSON
+        })
+        .promise();
+    },
+  },
+};
+</script>
+
+<style scoped>
+.container {
+  width: 500px;
+}
+
+.input-container {
+  display: flex;
+  justify-content: space-between;
+}
+
+.input-field {
+  flex-grow: 1;
+  margin-right: 10px;
+}
+
+.submit-button {
+  background-color: rgb(0, 149, 255);
+  padding: 5px 10px;
+}
+</style>
